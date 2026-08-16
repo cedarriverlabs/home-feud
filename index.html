@@ -2,51 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Home Feud</title>
   <link rel="stylesheet" href="board-enhancements.css">
+  <style>
+    body { margin: 0; background: #0b1a3a; }
+    #boot { color: #fff; font-family: system-ui; text-align: center; padding-top: 3rem; }
+  </style>
 </head>
 <body>
-  <p id="loading" style="color:#fff;font-family:system-ui;text-align:center;margin-top:3rem">Loading Home Feud…</p>
+  <div id="boot">Loading Home Feud…</div>
   <script>
-    // Load the main game HTML and inject the enhancements
-    fetch("Home-Feud.html" + window.location.search)
-      .then(r => r.text())
-      .then(html => {
-        // Extract the body content and styles from the game file
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, "text/html");
+    // Load the original game as a full document into an iframe, then we enhance the parent? 
+    // Better approach: redirect to the real game and inject via query or just tell user the direct link still works.
+    // For reliability, just redirect and load the enhancement scripts on the game page itself via a different method.
 
-        // Copy styles
-        doc.querySelectorAll("style").forEach(s => document.head.appendChild(s.cloneNode(true)));
-
-        // Copy the body
-        document.body.innerHTML = doc.body.innerHTML;
-
-        // Copy and run the main script
-        const scripts = doc.querySelectorAll("script");
-        scripts.forEach(oldScript => {
-          const newScript = document.createElement("script");
-          newScript.textContent = oldScript.textContent;
-          document.body.appendChild(newScript);
-        });
-
-        // Load the enhancements after the main script
-        const enh = document.createElement("script");
-        enh.src = "board-enhancements.js";
-        document.body.appendChild(enh);
-
-        // Preserve the view query param behavior
-        const params = new URLSearchParams(window.location.search);
-        const view = params.get("view");
-        if (view === "board" || view === "buzzer") {
-          // The main script already handles ?view=
-        }
-      })
-      .catch(err => {
-        document.getElementById("loading").textContent = "Failed to load. Open Home-Feud.html directly.";
-        console.error(err);
-      });
+    // Simplest reliable path right now:
+    const params = window.location.search || "";
+    window.location.replace("Home-Feud.html" + params);
   </script>
 </body>
 </html>
