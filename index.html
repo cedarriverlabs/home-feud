@@ -1,12 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Home Feud</title>
-  <meta http-equiv="refresh" content="0; url=Home-Feud.html">
-  <script>window.location.replace("Home-Feud.html" + window.location.search);</script>
+  <link rel="stylesheet" href="board-enhancements.css">
 </head>
 <body>
-  <p>Loading Home Feud… <a href="Home-Feud.html">Click here if not redirected</a></p>
+  <p id="loading" style="color:#fff;font-family:system-ui;text-align:center;margin-top:3rem">Loading Home Feud…</p>
+  <script>
+    // Load the main game HTML and inject the enhancements
+    fetch("Home-Feud.html" + window.location.search)
+      .then(r => r.text())
+      .then(html => {
+        // Extract the body content and styles from the game file
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+
+        // Copy styles
+        doc.querySelectorAll("style").forEach(s => document.head.appendChild(s.cloneNode(true)));
+
+        // Copy the body
+        document.body.innerHTML = doc.body.innerHTML;
+
+        // Copy and run the main script
+        const scripts = doc.querySelectorAll("script");
+        scripts.forEach(oldScript => {
+          const newScript = document.createElement("script");
+          newScript.textContent = oldScript.textContent;
+          document.body.appendChild(newScript);
+        });
+
+        // Load the enhancements after the main script
+        const enh = document.createElement("script");
+        enh.src = "board-enhancements.js";
+        document.body.appendChild(enh);
+
+        // Preserve the view query param behavior
+        const params = new URLSearchParams(window.location.search);
+        const view = params.get("view");
+        if (view === "board" || view === "buzzer") {
+          // The main script already handles ?view=
+        }
+      })
+      .catch(err => {
+        document.getElementById("loading").textContent = "Failed to load. Open Home-Feud.html directly.";
+        console.error(err);
+      });
+  </script>
 </body>
 </html>
