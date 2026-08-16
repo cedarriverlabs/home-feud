@@ -1,5 +1,7 @@
-// Home Feud board enhancements v5
+// Home Feud board enhancements v6 – TV board flip support
 (function () {
+  let lastRevealed = [];
+
   function ensureSideScores() {
     const answersBoard = document.getElementById("answers-board");
     if (!answersBoard) return;
@@ -42,15 +44,42 @@
     });
   }
 
+  // On the TV board, detect newly revealed answers and flip them
+  function animateNewReveals() {
+    if (typeof state === "undefined" || !state.revealed) return;
+
+    const current = state.revealed.slice().sort();
+    const prev = lastRevealed.slice().sort();
+
+    // Find indexes that are in current but not in prev
+    const newly = current.filter(i => !prev.includes(i));
+
+    newly.forEach(function (idx) {
+      const row = document.querySelector('.answer-row[data-index="' + idx + '"]');
+      if (row) {
+        row.classList.remove("flipping");
+        void row.offsetWidth;
+        row.classList.add("flipping");
+        // Remove the class after the animation finishes so it can be reused
+        setTimeout(function () {
+          row.classList.remove("flipping");
+        }, 1200);
+      }
+    });
+
+    lastRevealed = state.revealed.slice();
+  }
+
   function injectRevealButton() {
     if (typeof state === "undefined" || !state.rounds) return;
+    // Only on host view
+    if (!document.body.classList.contains("host-view")) return;
+
     const round = state.rounds[state.currentRoundIndex];
     if (!round) return;
 
     const remaining = round.answers.length - (state.revealed ? state.revealed.length : 0);
     if (remaining <= 0) return;
-
-    // Show whenever there are remaining answers (idle / after play / steal)
     if (state.mode === "faceoff") return;
 
     const actions = document.getElementById("dynamic-actions");
@@ -60,7 +89,7 @@
     const btn = document.createElement("button");
     btn.className = "btn-lg btn-orange";
     btn.setAttribute("data-hf-reveal-next", "1");
-    btn.innerHTML = "Reveal next remaining answer (" + remaining + " left)<br><small style=\"font-weight:500;opacity:0.85\">One click = one answer, just like the show</small>";
+    btn.innerHTML = "Reveal next remaining answer (" + remaining + " left)<br><small style=\"font-weight:500;opacity:0.85\">One click = one answer</small>";
     btn.onclick = function () {
       window.revealNextRemaining();
     };
@@ -77,8 +106,9 @@
       setTimeout(function () {
         ensureSideScores();
         ensureDataIndexes();
+        animateNewReveals();   // <-- this makes the TV board flip
         injectRevealButton();
-      }, 20);
+      }, 30);
     };
     window.render.__hfEnhanced = true;
     return true;
@@ -90,19 +120,15 @@
 
     const original = window.revealAnswer;
     window.revealAnswer = function (idx) {
+      // On the host we still do a local flip for immediate feedback
       const row = document.querySelector('.answer-row[data-index="' + idx + '"]');
-      if (row) {
+      if (row && document.body.classList.contains("host-view")) {
         row.classList.remove("flipping");
         void row.offsetWidth;
         row.classList.add("flipping");
-
-        // Wait for the slower flip (halfway) before updating content
-        setTimeout(function () {
-          original.call(window, idx);
-        }, 500);
-      } else {
-        original.call(window, idx);
       }
+      // Call original so state updates and both windows re-render
+      original.call(window, idx);
     };
     window.revealAnswer.__hfEnhanced = true;
     return true;
@@ -115,7 +141,7 @@
     for (let i = 0; i < round.answers.length; i++) {
       if (!state.revealed.includes(i)) {
         window.revealAnswer(i);
-        return; // only one answer per click
+        return;
       }
     }
   };
@@ -127,10 +153,9 @@
     const ok2 = patchReveal();
     ensureSideScores();
     ensureDataIndexes();
-    injectRevealButton();
     if ((ok1 && ok2) || tries > 60) {
       clearInterval(iv);
-      console.log("[Home Feud] Board enhancements v5 active – slow horizontal flip + one-at-a-time reveal");
+      console.log("[Home Feud] Board enhancements v6 – TV board now flips");
     }
   }, 200);
 })();
