@@ -1,4 +1,4 @@
-// Home Feud board enhancements v3
+// Home Feud board enhancements v4
 (function () {
   function ensureSideScores() {
     const answersBoard = document.getElementById("answers-board");
@@ -20,14 +20,12 @@
       right.className = "side-score team2";
       right.innerHTML = '<div class="side-name" id="side-name2">Family 2</div><div class="side-pts" id="side-score2">0</div>';
 
-      // Insert wrapper and move the answers board into it
       answersBoard.parentNode.insertBefore(wrapper, answersBoard);
       wrapper.appendChild(left);
       wrapper.appendChild(answersBoard);
       wrapper.appendChild(right);
     }
 
-    // Always sync the numbers
     const n1 = document.getElementById("name1");
     const n2 = document.getElementById("name2");
     const s1 = document.getElementById("score1");
@@ -38,11 +36,38 @@
     if (s2) document.getElementById("side-score2").textContent = s2.textContent;
   }
 
-  // Make sure every answer row has a data-index (the original file was missing it)
   function ensureDataIndexes() {
     document.querySelectorAll(".answers-grid .answer-row").forEach((row, i) => {
-      if (!row.dataset.index) row.dataset.index = i;
+      row.dataset.index = i;
     });
+  }
+
+  // Inject "Reveal next remaining" button into host controls when needed
+  function injectRevealButton() {
+    if (typeof state === "undefined" || !state.rounds) return;
+    const round = state.rounds[state.currentRoundIndex];
+    if (!round) return;
+
+    const remaining = round.answers.length - state.revealed.length;
+    if (remaining <= 0) return;
+
+    // Only show after the round has been played (idle or after award)
+    if (state.mode !== "idle" && state.mode !== "playing" && state.mode !== "steal") return;
+
+    const actions = document.getElementById("dynamic-actions");
+    if (!actions) return;
+
+    // Don't add duplicates
+    if (actions.querySelector("[data-hf-reveal-next]")) return;
+
+    const btn = document.createElement("button");
+    btn.className = "btn-lg btn-orange";
+    btn.setAttribute("data-hf-reveal-next", "1");
+    btn.innerHTML = "Reveal next remaining answer<br><small style=\"font-weight:500;opacity:0.85\">One at a time like the show</small>";
+    btn.onclick = function () {
+      window.revealNextRemaining();
+    };
+    actions.appendChild(btn);
   }
 
   function patchRender() {
@@ -55,7 +80,8 @@
       setTimeout(function () {
         ensureSideScores();
         ensureDataIndexes();
-      }, 10);
+        injectRevealButton();
+      }, 20);
     };
     window.render.__hfEnhanced = true;
     return true;
@@ -67,20 +93,26 @@
 
     const original = window.revealAnswer;
     window.revealAnswer = function (idx) {
-      // Find the row and play the flip
+      // Play flip BEFORE the original re-renders the board
       const row = document.querySelector('.answer-row[data-index="' + idx + '"]');
       if (row) {
         row.classList.remove("flipping");
-        void row.offsetWidth; // restart animation
+        // Force reflow so the animation restarts
+        void row.offsetWidth;
         row.classList.add("flipping");
+
+        // Let the flip play, then let the original update the content
+        setTimeout(function () {
+          original.call(window, idx);
+        }, 280);
+      } else {
+        original.call(window, idx);
       }
-      original.apply(this, arguments);
     };
     window.revealAnswer.__hfEnhanced = true;
     return true;
   }
 
-  // One-by-one reveal helper
   window.revealNextRemaining = function () {
     if (typeof state === "undefined" || !state.rounds) return;
     const round = state.rounds[state.currentRoundIndex];
@@ -93,7 +125,6 @@
     }
   };
 
-  // Poll until the main game has finished loading its functions
   let tries = 0;
   const iv = setInterval(function () {
     tries++;
@@ -101,9 +132,10 @@
     const ok2 = patchReveal();
     ensureSideScores();
     ensureDataIndexes();
+    injectRevealButton();
     if ((ok1 && ok2) || tries > 60) {
       clearInterval(iv);
-      console.log("[Home Feud] Board enhancements active");
+      console.log("[Home Feud] Board enhancements v4 active");
     }
   }, 200);
 })();
