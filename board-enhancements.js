@@ -1,4 +1,4 @@
-// Home Feud board enhancements v4
+// Home Feud board enhancements v5
 (function () {
   function ensureSideScores() {
     const answersBoard = document.getElementById("answers-board");
@@ -42,28 +42,25 @@
     });
   }
 
-  // Inject "Reveal next remaining" button into host controls when needed
   function injectRevealButton() {
     if (typeof state === "undefined" || !state.rounds) return;
     const round = state.rounds[state.currentRoundIndex];
     if (!round) return;
 
-    const remaining = round.answers.length - state.revealed.length;
+    const remaining = round.answers.length - (state.revealed ? state.revealed.length : 0);
     if (remaining <= 0) return;
 
-    // Only show after the round has been played (idle or after award)
-    if (state.mode !== "idle" && state.mode !== "playing" && state.mode !== "steal") return;
+    // Show whenever there are remaining answers (idle / after play / steal)
+    if (state.mode === "faceoff") return;
 
     const actions = document.getElementById("dynamic-actions");
     if (!actions) return;
-
-    // Don't add duplicates
     if (actions.querySelector("[data-hf-reveal-next]")) return;
 
     const btn = document.createElement("button");
     btn.className = "btn-lg btn-orange";
     btn.setAttribute("data-hf-reveal-next", "1");
-    btn.innerHTML = "Reveal next remaining answer<br><small style=\"font-weight:500;opacity:0.85\">One at a time like the show</small>";
+    btn.innerHTML = "Reveal next remaining answer (" + remaining + " left)<br><small style=\"font-weight:500;opacity:0.85\">One click = one answer, just like the show</small>";
     btn.onclick = function () {
       window.revealNextRemaining();
     };
@@ -93,18 +90,16 @@
 
     const original = window.revealAnswer;
     window.revealAnswer = function (idx) {
-      // Play flip BEFORE the original re-renders the board
       const row = document.querySelector('.answer-row[data-index="' + idx + '"]');
       if (row) {
         row.classList.remove("flipping");
-        // Force reflow so the animation restarts
         void row.offsetWidth;
         row.classList.add("flipping");
 
-        // Let the flip play, then let the original update the content
+        // Wait for the slower flip (halfway) before updating content
         setTimeout(function () {
           original.call(window, idx);
-        }, 280);
+        }, 500);
       } else {
         original.call(window, idx);
       }
@@ -120,7 +115,7 @@
     for (let i = 0; i < round.answers.length; i++) {
       if (!state.revealed.includes(i)) {
         window.revealAnswer(i);
-        return;
+        return; // only one answer per click
       }
     }
   };
@@ -135,7 +130,7 @@
     injectRevealButton();
     if ((ok1 && ok2) || tries > 60) {
       clearInterval(iv);
-      console.log("[Home Feud] Board enhancements v4 active");
+      console.log("[Home Feud] Board enhancements v5 active – slow horizontal flip + one-at-a-time reveal");
     }
   }, 200);
 })();
