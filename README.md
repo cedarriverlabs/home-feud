@@ -1,27 +1,21 @@
 # Home Feud
 
-Simple Family Feud-style game for family Thanksgiving / Christmas gatherings.
+Simple Family Feud-style game for family gatherings.
 
-Pure browser, no server, no accounts, no connection drops.
+## Live links
 
-## Live links (after you enable GitHub Pages)
+- **Host**: https://cedarriverlabs.github.io/home-feud/Home-Feud.html
+- **TV Board**: https://cedarriverlabs.github.io/home-feud/Home-Feud.html?view=board
 
-- **Host (controls)**: https://cedarriverlabs.github.io/home-feud/
-- **TV Board**: https://cedarriverlabs.github.io/home-feud/?view=board
+## New board enhancements (side scores + flip + one-by-one reveal)
 
-## Enable GitHub Pages (one-time, 30 seconds)
+The files `board-enhancements.css` and `board-enhancements.js` are already in the repo.
 
-1. Go to https://github.com/cedarriverlabs/home-feud/settings/pages
-2. Under **Source**, choose **Deploy from a branch**
-3. Branch: `main`  /  Folder: `/ (root)`
-4. Click **Save**
+To activate them, open `Home-Feud.html` on GitHub, click the pencil, and add these two lines just before the closing `</head>` tag:
 
-Wait 1–2 minutes, then the links above will work.
+```html
+<link rel="stylesheet" href="board-enhancements.css">
+<script src="board-enhancements.js" defer></script>
+```
 
-## How to play
-
-1. Open the **Host** link on your laptop → Enable Sounds
-2. Open the **TV Board** link on the TV / second window (or cast it)
-3. Load a theme (Thanksgiving / Christmas / etc.) and start
-
-Host sees all answers (dimmed until revealed). TV only shows the classic numbered board.
+Then commit. After that the side scores, tile flip, and "reveal next remaining" will be live. No full file download needed.
