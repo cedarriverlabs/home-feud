@@ -1,27 +1,27 @@
 /* Side scores beside the board */
 .board-with-scores {
-  display: grid;
-  grid-template-columns: 120px 1fr 120px;
+  display: grid !important;
+  grid-template-columns: 130px 1fr 130px;
   gap: 1rem;
-  max-width: 1000px;
+  max-width: 1050px;
   margin: 0 auto;
   align-items: center;
 }
 .side-score {
   text-align: center;
-  padding: 1rem 0.5rem;
+  padding: 1.1rem 0.5rem;
   background: #0d2040;
   border-radius: 12px;
   border: 3px solid #1e3a6e;
 }
 .side-score .side-name {
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 700;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.35rem;
   word-break: break-word;
 }
 .side-score .side-pts {
-  font-size: 2.4rem;
+  font-size: 2.6rem;
   font-weight: 900;
   line-height: 1;
 }
@@ -30,20 +30,30 @@
 .side-score.team2 .side-name,
 .side-score.team2 .side-pts { color: #ff6b00; }
 
+/* Hide the old top scores once side scores exist */
+.board-with-scores ~ * .scores,
+.topbar .scores {
+  opacity: 0.35;
+  font-size: 0.95rem;
+}
+
 /* Flip animation */
-.answer-row { perspective: 800px; }
+.answer-row {
+  perspective: 900px;
+}
 .answer-row.flipping {
   animation: feudFlip 0.55s cubic-bezier(0.4, 0, 0.2, 1);
 }
 @keyframes feudFlip {
   0%   { transform: rotateY(0deg); }
-  50%  { transform: rotateY(90deg); }
+  45%  { transform: rotateY(90deg); }
   100% { transform: rotateY(0deg); }
 }
 
-body.board-view .side-score .side-pts { font-size: 3rem; }
-body.board-view .side-score .side-name { font-size: 1.15rem; }
+/* Bigger on the TV board view */
+body.board-view .side-score .side-pts { font-size: 3.2rem; }
+body.board-view .side-score .side-name { font-size: 1.2rem; }
 body.board-view .board-with-scores {
-  max-width: 1100px;
-  grid-template-columns: 140px 1fr 140px;
+  max-width: 1150px;
+  grid-template-columns: 150px 1fr 150px;
 }
