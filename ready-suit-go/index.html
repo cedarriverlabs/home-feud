@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ready Suit Go — drop the tux, skip the morning-after return</title>
+<meta name="description" content="Sample concept site for Ready Suit Go. After the wedding, rental suits go in a venue locker or onto a scheduled pickup. We return them before the late fee starts." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,460;9..144,560;9..144,640&family=Outfit:wght@340;420;520;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink: #16140f;
+    --ink-soft: #3c3830;
+    --muted: #746c60;
+    --line: rgba(22, 20, 15, 0.12);
+    --paper: #f4efe6;
+    --paper-2: #ebe4d6;
+    --white: #fbf8f3;
+    --pine: #1a2820;
+    --pine-2: #24362b;
+    --brass: #9a7340;
+    --brass-2: #c6a56a;
+    --good: #2d6a4f;
+    --warn: #8a4b2f;
+    --shadow: 0 24px 60px rgba(22, 20, 15, 0.12);
+    --serif: "Fraunces", "Iowan Old Style", Palatino, serif;
+    --sans: "Outfit", "Avenir Next", "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-weight: 420;
+    line-height: 1.5;
+    font-size: 17px;
+  }
+  img { max-width: 100%; display: block; }
+  a { color: inherit; }
+  button, input, select, textarea { font-family: inherit; }
+  .ribbon {
+    background: var(--pine);
+    color: #efe7d8;
+    text-align: center;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    padding: 8px 16px;
+  }
+  .ribbon strong { color: var(--brass-2); font-weight: 520; }
+  header.nav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 7vw;
+    background: rgba(244, 239, 230, 0.9);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line);
+  }
+  .mark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    font-size: 13px;
+  }
+  .mark svg { display: block; }
+  nav.links { display: flex; gap: 22px; align-items: center; font-size: 15px; }
+  nav.links a { text-decoration: none; color: var(--ink-soft); }
+  nav.links a:hover { color: var(--ink); }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 0;
+    cursor: pointer;
+    text-decoration: none;
+    border-radius: 999px;
+    padding: 12px 18px;
+    font-size: 15px;
+    font-weight: 520;
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .btn.ghost {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+  .btn.brass { background: var(--brass); color: #fffaf3; }
+  .btn:hover { transform: translateY(-1px); }
+  .hero {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 48px;
+    padding: 72px 7vw 64px;
+    align-items: center;
+  }
+  .eyebrow {
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: var(--brass);
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  h1, h2, h3 { font-family: var(--serif); font-weight: 560; letter-spacing: -0.03em; margin: 0; }
+  h1 { font-size: clamp(42px, 5.6vw, 76px); line-height: 0.96; }
+  h2 { font-size: clamp(32px, 4vw, 48px); line-height: 1.05; }
+  h3 { font-size: 26px; line-height: 1.15; }
+  .lede { font-size: 19px; color: var(--ink-soft); max-width: 46ch; margin: 22px 0 28px; }
+  .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .fine { color: var(--muted); font-size: 13px; margin-top: 14px; }
+  .ticket {
+    background: var(--pine);
+    color: #f6f1e7;
+    border-radius: 22px;
+    padding: 28px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+  .ticket:before {
+    content: "";
+    position: absolute;
+    inset: 14px;
+    border: 1px dashed rgba(198, 165, 106, 0.4);
+    border-radius: 14px;
+    pointer-events: none;
+  }
+  .ticket-top, .ticket-row, .ticket-foot { position: relative; }
+  .ticket-top { display: flex; justify-content: space-between; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brass-2); }
+  .ticket h3 { font-size: 34px; margin: 28px 0 8px; }
+  .ticket p { color: #d9d0c2; margin: 0 0 22px; }
+  .ticket-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding-top: 8px;
+  }
+  .ticket-row div { border-top: 1px solid rgba(255,255,255,0.12); padding-top: 12px; }
+  .ticket-row span { display: block; color: #b7c2b8; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .ticket-row strong { font-family: var(--serif); font-size: 22px; font-weight: 560; }
+  section { padding: 72px 7vw; }
+  .split { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 40px; align-items: end; margin-bottom: 28px; }
+  .grid-3, .grid-2 { display: grid; gap: 16px; }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+  .card {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 22px;
+  }
+  .card .num {
+    font-family: var(--serif);
+    color: var(--brass);
+    font-size: 28px;
+  }
+  .card h3 { font-size: 22px; margin: 8px 0; }
+  .card p, .prose p { color: var(--ink-soft); margin: 0; }
+  .path {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .path article {
+    border-radius: 22px;
+    padding: 28px;
+    min-height: 280px;
+  }
+  .path .a { background: var(--ink); color: var(--paper); }
+  .path .b { background: var(--paper-2); }
+  .path .kicker { letter-spacing: 0.14em; text-transform: uppercase; font-size: 12px; font-weight: 600; }
+  .path .a .kicker { color: var(--brass-2); }
+  .path .b .kicker { color: var(--brass); }
+  .path h3 { margin: 14px 0; font-size: 32px; }
+  .path li { margin: 8px 0; }
+  .steps { counter-reset: step; display: grid; gap: 12px; }
+  .steps article {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 14px;
+    align-items: start;
+    background: var(--white);
+    border-radius: 16px;
+    padding: 16px 18px;
+    border: 1px solid var(--line);
+  }
+  .steps article:before {
+    counter-increment: step;
+    content: counter(step, decimal-leading-zero);
+    font-family: var(--serif);
+    font-size: 24px;
+    color: var(--brass);
+  }
+  .econ {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: 22px;
+  }
+  label { display: block; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  input[type="range"] { width: 100%; accent-color: var(--brass); }
+  .slider-row { margin: 16px 0 8px; }
+  .slider-row strong { float: right; color: var(--ink); letter-spacing: 0; text-transform: none; font-size: 16px; }
+  .result {
+    background: var(--pine);
+    color: #f6f1e7;
+    border-radius: 22px;
+    padding: 28px;
+  }
+  .result .big {
+    font-family: var(--serif);
+    font-size: clamp(48px, 6vw, 72px);
+    line-height: 0.95;
+    margin: 10px 0 8px;
+  }
+  .result p { color: #d5d0c6; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); }
+  th { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 520; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .note {
+    background: #f7e7d4;
+    border-radius: 14px;
+    padding: 14px 16px;
+    color: var(--warn);
+    font-size: 15px;
+    margin-top: 14px;
+  }
+  .risks li { margin: 8px 0; }
+  #book { background: var(--white); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .wizard { display: grid; grid-template-columns: 220px 1fr; gap: 28px; }
+  .wizard ol { list-style: none; padding: 0; margin: 18px 0 0; }
+  .wizard li { padding: 8px 0; color: var(--muted); }
+  .wizard li.on { color: var(--ink); font-weight: 600; }
+  .checks { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .checks label {
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 15px;
+    color: var(--ink);
+    background: var(--paper);
+    border-radius: 12px;
+    padding: 10px 12px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .field { margin-bottom: 14px; }
+  input[type="text"], input[type="email"], select, textarea {
+    width: 100%;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    border-radius: 12px;
+    padding: 12px 12px;
+    font-size: 16px;
+  }
+  .confirm {
+    border: 1px dashed var(--brass);
+    border-radius: 18px;
+    padding: 22px;
+    background: var(--paper);
+  }
+  .qr {
+    width: 92px;
+    height: 92px;
+    background:
+      linear-gradient(90deg, var(--ink) 0 18%, transparent 18% 28%, var(--ink) 28% 40%, transparent 40% 52%, var(--ink) 52% 70%, transparent 70% 82%, var(--ink) 82% 100%),
+      linear-gradient(var(--ink) 0 18%, transparent 18% 28%, var(--ink) 28% 40%, transparent 40% 52%, var(--ink) 52% 70%, transparent 70% 82%, var(--ink) 82% 100%);
+    background-size: 100% 14%, 14% 100%;
+    border: 6px solid var(--ink);
+  }
+  footer {
+    padding: 36px 7vw 48px;
+    color: var(--muted);
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  .hide { display: none; }
+  @media (max-width: 860px) {
+    .hero, .split, .path, .econ, .wizard, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+    header.nav { padding: 12px 20px; }
+    section, .hero { padding-left: 20px; padding-right: 20px; }
+    nav.links { display: none; }
+    .checks { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+  <div class="ribbon">Cedar River Labs sample — not a live service, and not affiliated with any venue or rental shop. <strong>Ready Suit Go</strong></div>
+  <header class="nav">
+    <a class="mark" href="#top">
+      <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">
+        <rect x="1" y="1" width="26" height="26" rx="6" fill="#1a2820"/>
+        <path d="M8 11h12M14 11v8M10 19h8" stroke="#c6a56a" stroke-width="1.6" fill="none"/>
+      </svg>
+      READY SUIT GO
+    </a>
+    <nav class="links">
+      <a href="#problem">The errand</a>
+      <a href="#how">How it works</a>
+      <a href="#custody">Verification</a>
+      <a href="#money">Numbers</a>
+      <a href="#venues">Venues</a>
+      <a href="#book" class="btn">Try the drop flow</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div>
+        <div class="eyebrow">St. Louis corridor · concept</div>
+        <h1>The suit goes back. You don’t have to.</h1>
+        <p class="lede">Ready Suit Go is the morning-after return. Groomsmen drop rental suits in a venue locker at last call, or leave them for a scheduled pickup. We get them to the shop before the late fee starts.</p>
+        <div class="hero-actions">
+          <a class="btn" href="#book">Walk the guest flow</a>
+          <a class="btn ghost" href="#venues">Pitch for a venue</a>
+        </div>
+        <p class="fine">Working price in this sample: $50 a suit. Launch picture from the thread: one 75-acre venue a short walk from the operator, then the rest of the St. Louis weekend calendar. Indiana later.</p>
+      </div>
+      <aside class="ticket">
+        <div class="ticket-top"><span>Drop ticket</span><span>RSG-0481</span></div>
+        <h3>Knotting Hills<br/>Saturday night</h3>
+        <p>Jacket, trousers, shirt, shoes, tie. Photo taken at the locker. Shop drop scheduled before open Monday.</p>
+        <div class="ticket-row">
+          <div><span>Guest price</span><strong>$50</strong></div>
+          <div><span>Due back</span><strong>Next day</strong></div>
+        </div>
+        <div class="ticket-foot fine" style="position:relative;margin-top:18px;color:#b7c2b8;">Illustrative. Knotting Hills is the venue named in planning, not a partner.</div>
+      </aside>
+    </section>
+
+    <section id="problem">
+      <div class="split">
+        <h2>The party ends. The rental doesn’t.</h2>
+        <p class="prose" style="margin:0;color:var(--ink-soft)">Men’s Wearhouse and Jos. A. Bank want wedding rentals back the day after the event, at a store during open hours, or dropped at the shipper on the label the first business day. Miss it and the late fee is $20 a day, up to replacement cost. Sunday closings and outbound flights are where groomsmen get burned.</p>
+      </div>
+      <div class="grid-3">
+        <article class="card">
+          <div class="num">01</div>
+          <h3>Due tomorrow</h3>
+          <p>In-store orders are due back the day after the wedding, during store hours. A Saturday wedding often means a Sunday errand at a closed shop, then a Monday argument about two late days.</p>
+        </article>
+        <article class="card">
+          <div class="num">$20</div>
+          <h3>Per day, per suit</h3>
+          <p>That’s the published Men’s Wearhouse late fee. Six groomsmen who fly out Sunday can quietly add a few hundred dollars to a wedding nobody budgeted twice.</p>
+        </article>
+        <article class="card">
+          <div class="num">6</div>
+          <h3>Suits in one hallway</h3>
+          <p>The party is already in one building. Collecting them at the venue is a route. Asking six hungover people to find the shop before their flight is not.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="how">
+      <div class="eyebrow">Two ways in</div>
+      <h2 style="margin-bottom:22px">Locker at the venue, or a pickup with a signature.</h2>
+      <div class="path">
+        <article class="a">
+          <div class="kicker">Path A · their original idea</div>
+          <h3>Drop it in the locker.</h3>
+          <ul>
+            <li>A bank of lockers lives at the venue, near the exit or the groomsmen’s quarters.</li>
+            <li>Guest pays ahead, agrees to terms on a QR code, and lists every piece.</li>
+            <li>At the end of the night they bag it, photograph it, and confirm the list.</li>
+            <li>Morning route clears the lockers and hits the rental shops.</li>
+          </ul>
+        </article>
+        <article class="b">
+          <div class="kicker">Path B · the safer first version</div>
+          <h3>Someone shows up.</h3>
+          <ul>
+            <li>No locker hardware. A scheduled window, like a ride pickup.</li>
+            <li>Operator and guest check the list together and both sign on the phone.</li>
+            <li>Missing studs get caught while everyone is still in the room.</li>
+            <li>Same shop return. Better chain of custody. Easier to pilot this month.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section id="custody">
+      <div class="split">
+        <div>
+          <div class="eyebrow">The part that keeps you out of small claims</div>
+          <h2>Nothing is “in the locker” unless the photo says so.</h2>
+        </div>
+        <p style="margin:0;color:var(--ink-soft)">The failure mode is obvious: a guest swears the cufflinks went in, the bag comes back light, and the $50 job now owes a replacement. The flow below is the product. Push notifications are how the guest knows it landed.</p>
+      </div>
+      <div class="steps">
+        <article>
+          <div>
+            <h3>List the pieces before the wedding</h3>
+            <p>Jacket, trousers, shirt, shoes, tie, cummerbund, studs, cufflinks. Only what they declare is in scope.</p>
+          </div>
+        </article>
+        <article>
+          <div>
+            <h3>QR code, terms, once</h3>
+            <p>They agree the operator is a courier, not the rental company. Damage, stains, and the rental contract stay with the renter.</p>
+          </div>
+        </article>
+        <article>
+          <div>
+            <h3>Photo and a checkbox at drop</h3>
+            <p>Each declared item gets confirmed in the bag. No confirmation, no handoff. That record is the defense if something is “missing.”</p>
+          </div>
+        </article>
+        <article>
+          <div>
+            <h3>Ping when the shop has it</h3>
+            <p>Text or push at pickup, at the shop door, and when the return is accepted. The guest should not have to wonder.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="money">
+      <div class="split">
+        <div>
+          <div class="eyebrow">Illustrative, not a forecast</div>
+          <h2>What $50 and six suits actually gross.</h2>
+        </div>
+        <p style="margin:0;color:var(--ink-soft)">Assumptions from the thread: $50 a suit, six suits on a participating wedding, and an adoption rate against a venue’s wedding count. Gross, before lockers, insurance, mileage, and Saturday night.</p>
+      </div>
+      <div class="econ">
+        <div class="card">
+          <div class="slider-row"><label>Weddings on the route <strong id="wLabel">75</strong></label>
+            <input id="weddings" type="range" min="10" max="200" value="75" />
+          </div>
+          <div class="slider-row"><label>Adoption <strong id="aLabel">25%</strong></label>
+            <input id="adopt" type="range" min="5" max="80" value="25" />
+          </div>
+          <div class="slider-row"><label>Suits per participating wedding <strong id="sLabel">6</strong></label>
+            <input id="suits" type="range" min="2" max="14" value="6" />
+          </div>
+          <div class="slider-row"><label>Price per suit <strong id="pLabel">$50</strong></label>
+            <input id="price" type="range" min="25" max="90" step="5" value="50" />
+          </div>
+          <p class="fine">75 is a stand-in for “just that one venue,” not a published Knotting Hills count. The card in the thread said the same thing.</p>
+        </div>
+        <div class="result">
+          <div class="eyebrow" style="color:var(--brass-2)">Annual gross on these assumptions</div>
+          <div class="big" id="gross">$5,625</div>
+          <p id="grossDetail">About 19 participating weddings · 113 suits · before costs.</p>
+          <p>A corrected read of the text-thread card. That card ($13.5K at 30 weddings × 25%, up to $90K at 100 × 50%) matches the formula only if the six suits are counted twice. Same inputs, once each, are about one sixth of those headlines.</p>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <table>
+          <thead>
+            <tr><th>Scenario</th><th class="num">Participating</th><th class="num">Suits</th><th class="num">Gross</th><th class="num">Card in the thread</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>30 weddings × 25%</td><td class="num">8</td><td class="num">45</td><td class="num">$2,250</td><td class="num">$13,500</td></tr>
+            <tr><td>50 × 25%</td><td class="num">13</td><td class="num">75</td><td class="num">$3,750</td><td class="num">$22,500</td></tr>
+            <tr><td>75 × 25%</td><td class="num">19</td><td class="num">113</td><td class="num">$5,625</td><td class="num">$33,800</td></tr>
+            <tr><td>100 × 25%</td><td class="num">25</td><td class="num">150</td><td class="num">$7,500</td><td class="num">$45,000</td></tr>
+            <tr><td>100 × 50%</td><td class="num">50</td><td class="num">300</td><td class="num">$15,000</td><td class="num">$90,000</td></tr>
+          </tbody>
+        </table>
+        <div class="note">Still a real Saturday route if one venue says yes and pickups batch into a single morning. It is not passive income, and it is not $90K until the price, the suit count, or the number of venues moves.</div>
+      </div>
+    </section>
+
+    <section id="venues">
+      <div class="split">
+        <div>
+          <div class="eyebrow">Venue side</div>
+          <h2>An amenity that fits in a closet.</h2>
+        </div>
+        <p style="margin:0;color:var(--ink-soft)">Knotting Hills already has groom’s quarters, on-site housing, and two venues on 75 acres in Pevely. The pitch is not “let us run your wedding.” It is “your out-of-town party leaves on Sunday without a tuxedo errand.”</p>
+      </div>
+      <div class="grid-3">
+        <article class="card">
+          <h3>What the venue gives</h3>
+          <p>A corner for lockers, or a 20-minute window at the porte-cochère. A line in the guest info sheet. Nothing else on the night of.</p>
+        </article>
+        <article class="card">
+          <h3>What they get</h3>
+          <p>One less Sunday complaint. A named perk next to the getting-ready suite. Optional rev-share later, not required to start.</p>
+        </article>
+        <article class="card">
+          <h3>Why this venue first</h3>
+          <p>It’s the one in the thread: about a football field from the operator, 75 acres, and three newer rooms in the area if the first one works.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="risks">
+      <div class="eyebrow">Open before anyone buys a locker</div>
+      <h2 style="margin-bottom:18px">Five things the sample does not pretend are solved.</h2>
+      <div class="card">
+        <ol class="risks">
+          <li><strong>Will the shop take a third-party drop?</strong> Men’s Wearhouse can take a return at any of their stores, but the contract is with the renter. A pilot has to confirm they’ll accept a courier with the rental agreement and a release. If they won’t, the product is a labeled ship-back, not a counter drop.</li>
+          <li><strong>Sunday hours.</strong> A Saturday wedding due “the next day” collides with closed stores. The service has to know whether Monday morning is on time or already a $20 day. That answer changes the promise.</li>
+          <li><strong>Bailee, not buddy.</strong> Once the bag is in the locker, lost or stolen pieces are an insurance question. Cap liability at declared items, photograph the handoff, and don’t hold goods overnight without a policy that names it.</li>
+          <li><strong>Drunk inventory.</strong> Shoes left by the dance floor are not in the locker. The checklist is the product. If it isn’t confirmed, it isn’t picked up.</li>
+          <li><strong>Mail-back already exists.</strong> Shipped Men’s Wearhouse orders include a return label. The wedge is in-store parties, mixed flight times, and anyone who will not find a drop box before the shuttle.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="book">
+      <div class="wizard">
+        <div>
+          <div class="eyebrow">Clickable sample</div>
+          <h2>Guest drop</h2>
+          <ol id="stepList">
+            <li class="on">Wedding</li>
+            <li>Pieces</li>
+            <li>Terms</li>
+            <li>Ticket</li>
+          </ol>
+        </div>
+        <div>
+          <div id="step1">
+            <div class="field">
+              <label>Venue</label>
+              <select id="venue">
+                <option>Knotting Hills — The Lake (example)</option>
+                <option>Knotting Hills — Main Venue (example)</option>
+                <option>Other St. Louis venue</option>
+                <option>Indiana venue, later</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Name on the rental</label>
+              <input id="guest" type="text" placeholder="Alex Brennan" />
+            </div>
+            <div class="field">
+              <label>How it goes back</label>
+              <select id="mode">
+                <option>Locker drop at last call</option>
+                <option>Scheduled pickup, signed together</option>
+              </select>
+            </div>
+            <button class="btn" id="to2" type="button">List the pieces</button>
+          </div>
+          <div id="step2" class="hide">
+            <p style="margin-top:0;color:var(--ink-soft)">Only checked items are in scope. Anything else stays the guest’s problem on purpose.</p>
+            <div class="checks" id="pieces">
+              <label><input type="checkbox" checked data-piece="Jacket" /> Jacket</label>
+              <label><input type="checkbox" checked data-piece="Trousers" /> Trousers</label>
+              <label><input type="checkbox" checked data-piece="Shirt" /> Shirt</label>
+              <label><input type="checkbox" checked data-piece="Shoes" /> Shoes</label>
+              <label><input type="checkbox" data-piece="Tie" /> Tie</label>
+              <label><input type="checkbox" data-piece="Cummerbund" /> Cummerbund</label>
+              <label><input type="checkbox" data-piece="Studs" /> Studs</label>
+              <label><input type="checkbox" data-piece="Cufflinks" /> Cufflinks</label>
+            </div>
+            <p class="fine" id="pieceCount"></p>
+            <button class="btn" id="to3" type="button">Agree to terms</button>
+          </div>
+          <div id="step3" class="hide">
+            <div class="card">
+              <h3>Courier terms, short version</h3>
+              <p>Ready Suit Go moves declared items from the venue to the rental shop. It does not replace the rental contract. Stains, tears, and missing undeclared pieces stay with the renter. Handoff counts only after the photo confirmation. A lost declared item is capped at the shop’s replacement schedule, and only if the photo shows it in the bag.</p>
+            </div>
+            <div class="field" style="margin-top:14px">
+              <label style="text-transform:none;letter-spacing:0;font-size:15px;color:var(--ink)"><input id="agree" type="checkbox" /> I agree, and I’ll confirm each piece at the locker.</label>
+            </div>
+            <button class="btn" id="to4" type="button">Make the ticket</button>
+          </div>
+          <div id="step4" class="hide">
+            <div class="confirm">
+              <div style="display:flex;justify-content:space-between;gap:16px;align-items:start">
+                <div>
+                  <div class="eyebrow">Drop ticket · sample</div>
+                  <h3 id="ticketName" style="margin-top:8px">Alex</h3>
+                  <p id="ticketMeta" style="color:var(--ink-soft)"></p>
+                  <p id="ticketPieces" style="color:var(--ink)"></p>
+                  <p id="ticketPrice" style="font-family:var(--serif);font-size:32px;margin:8px 0 0"></p>
+                </div>
+                <div class="qr" aria-hidden="true"></div>
+              </div>
+            </div>
+            <p class="fine">Nothing was sent. In the real flow this QR is what the locker or the driver scans, and the guest gets a push when the shop scans it in.</p>
+            <button class="btn ghost" id="reset" type="button">Start over</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <div>Ready Suit Go · a Cedar River Labs sample, same public Pages setup as the other sites.</div>
+    <div>Men’s Wearhouse return rules cited from their rental FAQ and terms: due the day after the event, $20 a day late. Knotting Hills is a real 75-acre venue in Pevely, Missouri, used here only as the example in the thread.</div>
+  </footer>
+<script>
+  const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+  function calc() {
+    const w = +weddings.value, a = +adopt.value / 100, s = +suits.value, p = +price.value;
+    wLabel.textContent = w;
+    aLabel.textContent = adopt.value + "%";
+    sLabel.textContent = s;
+    pLabel.textContent = money.format(p);
+    const participating = w * a;
+    const suitCount = participating * s;
+    const gross = suitCount * p;
+    document.getElementById("gross").textContent = money.format(gross);
+    document.getElementById("grossDetail").textContent =
+      "About " + Math.round(participating) + " participating weddings · " + Math.round(suitCount) + " suits · before costs.";
+  }
+  ["weddings", "adopt", "suits", "price"].forEach(id => document.getElementById(id).addEventListener("input", calc));
+  calc();
+
+  const steps = [1, 2, 3, 4].map(n => document.getElementById("step" + n));
+  const labels = document.querySelectorAll("#stepList li");
+  function show(n) {
+    steps.forEach((el, i) => el.classList.toggle("hide", i !== n - 1));
+    labels.forEach((el, i) => el.classList.toggle("on", i === n - 1));
+  }
+  function selectedPieces() {
+    return [...document.querySelectorAll("#pieces input:checked")].map(el => el.dataset.piece);
+  }
+  function refreshCount() {
+    const n = selectedPieces().length;
+    document.getElementById("pieceCount").textContent = n ? n + " pieces in scope · " + money.format(50) + " in this sample." : "Check at least one piece.";
+  }
+  document.getElementById("pieces").addEventListener("change", refreshCount);
+  refreshCount();
+  document.getElementById("to2").onclick = () => {
+    if (!document.getElementById("guest").value.trim()) document.getElementById("guest").value = "Alex Brennan";
+    show(2);
+  };
+  document.getElementById("to3").onclick = () => {
+    if (!selectedPieces().length) return;
+    show(3);
+  };
+  document.getElementById("to4").onclick = () => {
+    if (!document.getElementById("agree").checked) {
+      document.getElementById("agree").focus();
+      return;
+    }
+    const name = document.getElementById("guest").value.trim();
+    const venue = document.getElementById("venue").value;
+    const mode = document.getElementById("mode").value;
+    const pieces = selectedPieces();
+    document.getElementById("ticketName").textContent = name;
+    document.getElementById("ticketMeta").textContent = venue + " · " + mode;
+    document.getElementById("ticketPieces").textContent = pieces.join(" · ");
+    document.getElementById("ticketPrice").textContent = money.format(50) + " due at drop";
+    show(4);
+  };
+  document.getElementById("reset").onclick = () => {
+    document.getElementById("agree").checked = false;
+    show(1);
+  };
+</script>
+</body>
+</html>
