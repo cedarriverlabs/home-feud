@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Heady Christmas Family Bingo</title>
+  <style>
+    :root {
+      --red: #c41e3a;
+      --dark-red: #8b0000;
+      --green: #16a34a;
+      --green-bright: #22c55e;
+      --green-dark: #15803d;
+      --gold: #ffd700;
+      --gold-dark: #c9a227;
+      --cream: #fff8e7;
+      --bg: #0a1628;
+      --card-bg: rgba(20, 40, 60, 0.92);
+      --uncalled-bg: #1a2433;
+      --uncalled-text: #5a6a7a;
+      --text: #f5f5f5;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(160deg, #0a1628 0%, #1a2a40 40%, #0d2b1a 100%);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: 
+        radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.35), transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.25), transparent),
+        radial-gradient(1.5px 1.5px at 50px 160px, rgba(255,255,255,0.4), transparent),
+        radial-gradient(2px 2px at 90px 40px, rgba(255,255,255,0.25), transparent),
+        radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.35), transparent);
+      background-size: 200px 200px;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.5;
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      max-width: 1700px;
+      margin: 0 auto;
+      padding: 10px 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: linear-gradient(90deg, var(--dark-red), var(--red), var(--dark-red));
+      border-radius: 14px;
+      padding: 10px 16px;
+      box-shadow: 0 4px 20px rgba(196, 30, 58, 0.4);
+      border: 2px solid var(--gold);
+    }
+
+    .title {
+      font-size: clamp(1.2rem, 2.6vw, 1.9rem);
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      color: var(--cream);
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5), 0 0 16px rgba(255,215,0,0.25);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .title .emoji { font-size: 1.2em; }
+
+    .mode-badge {
+      font-size: 0.68rem;
+      background: rgba(0,0,0,0.4);
+      color: var(--gold);
+      padding: 3px 9px;
+      border-radius: 20px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border: 1px solid rgba(255,215,0,0.4);
+    }
+
+    .header-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    button, select {
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 7px 11px;
+      border-radius: 9px;
+      border: 2px solid var(--gold);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+    }
+
+    button:hover, select:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    button:active { transform: translateY(0); }
+
+    .btn-primary { background: var(--gold); color: #1a1a1a; }
+    .btn-secondary { background: var(--green-dark); color: white; border-color: #22c55e; }
+    .btn-danger { background: var(--dark-red); color: white; }
+    .btn-ghost { background: rgba(255,255,255,0.12); color: var(--cream); }
+    .btn-player { background: #1a4a8a; color: white; border-color: #2a6ab0; }
+    .btn-random { background: linear-gradient(135deg, #7c3aed, #a855f7); color: white; border-color: #c084fc; }
+
+    select {
+      background: var(--card-bg);
+      color: var(--cream);
+      min-width: 160px;
+    }
+
+    /* MAIN */
+    .main {
+      display: grid;
+      grid-template-columns: 240px 1fr 210px;
+      gap: 12px;
+      flex: 1;
+    }
+
+    @media (max-width: 1100px) {
+      .main { grid-template-columns: 1fr; }
+    }
+
+    body.player-mode .header-controls { display: none; }
+    body.player-mode .mode-badge { display: inline-block; }
+    body.player-mode .caller-only { display: none !important; }
+    body.player-mode .main { grid-template-columns: 280px 1fr 260px; }
+    body.player-mode .number-btn { cursor: default; pointer-events: none; }
+    body.player-mode .number-btn:hover { transform: none; box-shadow: none; }
+    body.player-mode .tip { display: none; }
+    body.player-mode .fullscreen-btn { opacity: 0.85; }
+
+    .panel {
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 12px;
+      border: 1px solid rgba(255,215,0,0.22);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .panel h2 {
+      font-size: 0.92rem;
+      color: var(--gold);
+      text-align: center;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .pattern-name {
+      text-align: center;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--cream);
+      min-height: 1.35em;
+    }
+
+    .mini-card {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 3px;
+      background: #1a2a3a;
+      padding: 7px;
+      border-radius: 10px;
+      border: 2px solid var(--gold-dark);
+      max-width: 220px;
+      margin: 0 auto;
+    }
+
+    body.player-mode .mini-card { max-width: 250px; gap: 4px; padding: 9px; }
+
+    .mini-cell {
+      background: #2a3a4a;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.66rem;
+      font-weight: 600;
+      color: #a0b0c0;
+      aspect-ratio: 1;
+      transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+    }
+
+    .mini-cell.header {
+      background: var(--red);
+      color: white;
+      font-weight: 800;
+      font-size: 0.78rem;
+    }
+
+    .mini-cell.free {
+      background: var(--green-dark);
+      color: white;
+      font-size: 0.58rem;
+    }
+
+    .mini-cell.pattern {
+      background: var(--gold);
+      color: #1a1a1a;
+      box-shadow: 0 0 8px rgba(255,215,0,0.5);
+      font-weight: 800;
+    }
+
+    .pattern-desc {
+      font-size: 0.76rem;
+      color: #b0c0d0;
+      text-align: center;
+      line-height: 1.35;
+    }
+
+    /* BOARD */
+    .board-panel { display: flex; flex-direction: column; gap: 8px; }
+
+    .board-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .stats {
+      font-size: 0.95rem;
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    .bingo-board {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 7px;
+      flex: 1;
+    }
+
+    .column {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      background: rgba(0,0,0,0.28);
+      border-radius: 11px;
+      padding: 5px;
+      border: 1px solid rgba(255,215,0,0.12);
+    }
+
+    .col-header {
+      text-align: center;
+      font-size: clamp(1.15rem, 2.2vw, 1.65rem);
+      font-weight: 900;
+      color: white;
+      border-radius: 7px;
+      padding: 5px 0;
+      letter-spacing: 2px;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    }
+
+    .col-header.B { background: linear-gradient(180deg, #c41e3a, #9b1b2f); }
+    .col-header.I { background: linear-gradient(180deg, #0b6b3a, #08502c); }
+    .col-header.N { background: linear-gradient(180deg, #1a4a8a, #123566); }
+    .col-header.G { background: linear-gradient(180deg, #c41e3a, #9b1b2f); }
+    .col-header.O { background: linear-gradient(180deg, #0b6b3a, #08502c); }
+
+    .number-btn {
+      flex: 1;
+      min-height: 33px;
+      border: none;
+      border-radius: 7px;
+      font-size: clamp(0.88rem, 1.6vw, 1.15rem);
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--uncalled-bg);
+      color: var(--uncalled-text);
+      transition: all 0.2s ease;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+      position: relative;
+      opacity: 0.72;
+    }
+
+    .number-btn:hover:not(.called):not(:disabled) {
+      background: #243447;
+      color: #8a9aaa;
+      opacity: 0.95;
+      transform: scale(1.04);
+      z-index: 2;
+      box-shadow: 0 0 10px rgba(255,255,255,0.08);
+    }
+
+    .number-btn.called {
+      background: linear-gradient(180deg, var(--green-bright), var(--green-dark));
+      color: #fff;
+      opacity: 1;
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.55), inset 0 1px 0 rgba(255,255,255,0.25);
+      cursor: default;
+      font-weight: 800;
+    }
+
+    .number-btn.called::after {
+      content: '✓';
+      position: absolute;
+      top: 1px;
+      right: 3px;
+      font-size: 0.62em;
+      opacity: 0.85;
+    }
+
+    /* RIGHT */
+    .last-called-box {
+      background: linear-gradient(160deg, var(--dark-red), #5a0a18);
+      border: 3px solid var(--gold);
+      border-radius: 14px;
+      padding: 14px 8px;
+      text-align: center;
+      box-shadow: 0 0 24px rgba(255,215,0,0.22);
+    }
+
+    body.player-mode .last-called-box { padding: 18px 10px; }
+
+    .last-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 2px;
+    }
+
+    .last-number {
+      font-size: clamp(1.9rem, 4.2vw, 3rem);
+      font-weight: 900;
+      color: var(--gold);
+      line-height: 1.05;
+      text-shadow: 0 0 18px rgba(255,215,0,0.45);
+      min-height: 1.15em;
+    }
+
+    body.player-mode .last-number {
+      font-size: clamp(2.4rem, 5.5vw, 3.8rem);
+    }
+
+    .last-letter {
+      font-size: 0.55em;
+      display: block;
+      color: white;
+    }
+
+    .history {
+      flex: 1;
+      overflow-y: auto;
+      max-height: 290px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding-right: 3px;
+    }
+
+    body.player-mode .history { max-height: 270px; }
+
+    .history-item {
+      background: rgba(255,255,255,0.06);
+      padding: 5px 9px;
+      border-radius: 7px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      border-left: 3px solid var(--green-bright);
+    }
+
+    .history-item:first-child {
+      background: rgba(34, 197, 94, 0.18);
+    }
+
+    /* ===== BINGO BALL OVERLAY ===== */
+    #call-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 10, 20, 0.92);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    #call-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .bingo-ball {
+      width: clamp(220px, 38vw, 420px);
+      height: clamp(220px, 38vw, 420px);
+      border-radius: 50%;
+      background: 
+        radial-gradient(circle at 32% 28%, rgba(255,255,255,0.55) 0%, transparent 28%),
+        radial-gradient(circle at 50% 50%, #f8fafc 0%, #e2e8f0 45%, #94a3b8 100%);
+      box-shadow: 
+        0 0 0 8px rgba(255,255,255,0.08),
+        0 0 0 14px rgba(0,0,0,0.15),
+        0 25px 60px rgba(0,0,0,0.55),
+        inset 0 -18px 40px rgba(0,0,0,0.18),
+        inset 0 12px 30px rgba(255,255,255,0.35);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transform: scale(0.3);
+      opacity: 0;
+      transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+    }
+
+    #call-overlay.visible .bingo-ball {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    #call-overlay.dissolving .bingo-ball {
+      transform: scale(1.15);
+      opacity: 0;
+      transition: transform 0.7s ease, opacity 0.7s ease;
+    }
+
+    .ball-letter {
+      font-size: clamp(2.2rem, 7vw, 4.5rem);
+      font-weight: 900;
+      color: #0f172a;
+      letter-spacing: 2px;
+      line-height: 1;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+      margin-bottom: 2px;
+    }
+
+    .ball-number {
+      font-size: clamp(3.5rem, 12vw, 7.5rem);
+      font-weight: 900;
+      color: #0f172a;
+      line-height: 0.9;
+      text-shadow: 0 2px 0 rgba(255,255,255,0.5);
+    }
+
+    .ball-shine {
+      position: absolute;
+      top: 12%;
+      left: 18%;
+      width: 28%;
+      height: 18%;
+      border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(255,255,255,0.7) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .call-sub {
+      margin-top: 22px;
+      font-size: 1.25rem;
+      color: rgba(255,255,255,0.55);
+      letter-spacing: 2px;
+      text-align: center;
+    }
+
+    .tip {
+      text-align: center;
+      font-size: 0.76rem;
+      color: rgba(255,255,255,0.4);
+      padding-top: 2px;
+    }
+
+    .fullscreen-btn {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      z-index: 50;
+      opacity: 0.7;
+    }
+    .fullscreen-btn:hover { opacity: 1; }
+
+    .sync-status {
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.38);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="title">
+        <span class="emoji">🎄</span>
+        Heady Christmas Family Bingo
+        <span class="emoji">🎅</span>
+        <span class="mode-badge" id="mode-badge">Caller</span>
+      </div>
+      <div class="header-controls caller-only">
+        <select id="pattern-select" title="Select the winning pattern">
+          <option value="line">Any Straight Line</option>
+          <option value="corners">Four Corners</option>
+          <option value="blackout">Blackout (Full House)</option>
+          <option value="x">Letter X</option>
+          <option value="tree">Christmas Tree</option>
+          <option value="postage">Postage Stamp</option>
+          <option value="frame">Outside Frame</option>
+          <option value="t">Letter T</option>
+          <option value="l">Letter L</option>
+          <option value="plus">Plus / Cross</option>
+          <option value="diamond">Diamond</option>
+          <option value="sixpack">Six Pack</option>
+          <option value="twolines">Two Lines</option>
+        </select>
+        <button class="btn-random" id="random-pattern-btn" title="Pick a random game type">🎲 Random Game</button>
+        <button class="btn-secondary" id="undo-btn" title="Undo last call">↩ Undo</button>
+        <button class="btn-danger" id="reset-btn" title="Clear everything">🔄 New Game</button>
+        <button class="btn-ghost" id="speech-btn" title="Toggle voice on/off">🔊 On</button>
+        <select id="voice-select" title="Choose announcement voice" style="min-width:140px; max-width:200px;">
+          <option value="">Default voice</option>
+        </select>
+        <button class="btn-player" id="open-player-btn" title="Open the TV / Player view in a new tab">📺 Open Player View</button>
+      </div>
+    </header>
+
+    <div class="main">
+      <!-- LEFT: Pattern -->
+      <div class="panel">
+        <h2>Current Game</h2>
+        <div class="pattern-name" id="pattern-name">Any Straight Line</div>
+        <div class="mini-card" id="mini-card"></div>
+        <p class="pattern-desc" id="pattern-desc">Mark any complete horizontal, vertical, or diagonal line of 5 (the free space counts).</p>
+      </div>
+
+      <!-- CENTER: Board -->
+      <div class="board-panel panel" style="padding: 11px;">
+        <div class="board-header">
+          <div class="stats"><span id="called-count">0</span> / 75 called</div>
+          <div class="caller-only" style="font-size:0.8rem;color:#8a9aaa;">Click a number after you draw the ball</div>
+          <div class="player-only" style="font-size:0.8rem;color:#8a9aaa;display:none;">Watch the board &amp; last called</div>
+        </div>
+        <div class="bingo-board" id="bingo-board"></div>
+      </div>
+
+      <!-- RIGHT: Last + History -->
+      <div class="panel">
+        <div class="last-called-box">
+          <div class="last-label">Last Called</div>
+          <div class="last-number" id="last-display">
+            <span class="last-letter" id="last-letter">—</span>
+            <span id="last-num">—</span>
+          </div>
+        </div>
+        <h2 style="margin-top:6px;">Recent Calls</h2>
+        <div class="history" id="history-list">
+          <div style="text-align:center;color:#5a6a7a;font-size:0.8rem;padding:18px 0;">No numbers called yet</div>
+        </div>
+      </div>
+    </div>
+
+    <p class="tip caller-only">💡 <strong>Caller tip:</strong> Open this on your laptop. Click “📺 Open Player View” for the TV display (cast that tab). Both stay in sync automatically — no refresh needed.</p>
+    <p class="sync-status" id="sync-status"></p>
+  </div>
+
+  <button class="btn-ghost fullscreen-btn" id="fs-btn" title="Toggle fullscreen">⛶ Fullscreen</button>
+
+  <!-- Big Bingo Ball overlay -->
+  <div id="call-overlay">
+    <div style="display:flex;flex-direction:column;align-items:center;">
+      <div class="bingo-ball">
+        <div class="ball-shine"></div>
+        <div class="ball-letter" id="overlay-letter">B</div>
+        <div class="ball-number" id="overlay-num">12</div>
+      </div>
+      <div class="call-sub">Heady Christmas!</div>
+    </div>
+  </div>
+
+  <script>
+    // ===== Constants =====
+    const STORAGE_KEY = 'headyChristmasBingo_v2';
+    const CHANNEL_NAME = 'headyBingoSync_v2';
+
+    const COLUMNS = {
+      B: Array.from({length:15}, (_,i) => i+1),
+      I: Array.from({length:15}, (_,i) => i+16),
+      N: Array.from({length:15}, (_,i) => i+31),
+      G: Array.from({length:15}, (_,i) => i+46),
+      O: Array.from({length:15}, (_,i) => i+61)
+    };
+    const LETTERS = ['B','I','N','G','O'];
+
+    const SAMPLE_CARD = [
+      [3, 18, 34, 48, 62],
+      [7, 22, 41, 53, 67],
+      [12, 27, 'FREE', 55, 71],
+      [9, 29, 38, 58, 74],
+      [14, 25, 44, 50, 69]
+    ];
+
+    const PATTERNS = {
+      line: {
+        name: 'Any Straight Line',
+        desc: 'Mark any complete horizontal, vertical, or diagonal line of 5 (the free space counts).',
+        cells: [[2,0],[2,1],[2,2],[2,3],[2,4]]
+      },
+      corners: {
+        name: 'Four Corners',
+        desc: 'Mark the four corner numbers of the card. Free space is not required.',
+        cells: [[0,0],[0,4],[4,0],[4,4]]
+      },
+      blackout: {
+        name: 'Blackout (Full House)',
+        desc: 'Cover every single square on the card. The longest and most exciting game!',
+        cells: (() => {
+          const c = [];
+          for(let r=0;r<5;r++) for(let col=0;col<5;col++) c.push([r,col]);
+          return c;
+        })()
+      },
+      x: {
+        name: 'Letter X',
+        desc: 'Mark both diagonals that cross through the free space, forming a big X.',
+        cells: [[0,0],[1,1],[2,2],[3,3],[4,4],[0,4],[1,3],[3,1],[4,0]]
+      },
+      tree: {
+        name: 'Christmas Tree',
+        desc: 'A festive tree shape: wide base, tapering upward, with a small trunk at the bottom.',
+        cells: [[0,2],[1,1],[1,2],[1,3],[2,0],[2,1],[2,2],[2,3],[2,4],[3,1],[3,2],[3,3],[4,2]]
+      },
+      postage: {
+        name: 'Postage Stamp',
+        desc: 'Mark any 2×2 block of four numbers in a corner of the card.',
+        cells: [[0,0],[0,1],[1,0],[1,1]]
+      },
+      frame: {
+        name: 'Outside Frame',
+        desc: 'Mark the entire outer edge of the card (all 16 outer squares).',
+        cells: [
+          [0,0],[0,1],[0,2],[0,3],[0,4],
+          [1,0],[1,4],
+          [2,0],[2,4],
+          [3,0],[3,4],
+          [4,0],[4,1],[4,2],[4,3],[4,4]
+        ]
+      },
+      t: {
+        name: 'Letter T',
+        desc: 'Mark the top row and the center column, forming a capital T.',
+        cells: [[0,0],[0,1],[0,2],[0,3],[0,4],[1,2],[2,2],[3,2],[4,2]]
+      },
+      l: {
+        name: 'Letter L',
+        desc: 'Mark the left column and the bottom row, forming a capital L.',
+        cells: [[0,0],[1,0],[2,0],[3,0],[4,0],[4,1],[4,2],[4,3],[4,4]]
+      },
+      plus: {
+        name: 'Plus / Cross',
+        desc: 'Mark the full center row and center column, forming a plus sign (+).',
+        cells: [[0,2],[1,2],[2,0],[2,1],[2,2],[2,3],[2,4],[3,2],[4,2]]
+      },
+      diamond: {
+        name: 'Diamond',
+        desc: 'Mark the four mid-side squares and the center, forming a diamond shape.',
+        cells: [[0,2],[1,1],[1,3],[2,0],[2,2],[2,4],[3,1],[3,3],[4,2]]
+      },
+      sixpack: {
+        name: 'Six Pack',
+        desc: 'Mark any 2×3 block of six numbers (like a six-pack of cans).',
+        cells: [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]]
+      },
+      twolines: {
+        name: 'Two Lines',
+        desc: 'Complete any two full lines (horizontal, vertical, or diagonal) on the same card.',
+        cells: [[0,0],[0,1],[0,2],[0,3],[0,4],[4,0],[4,1],[4,2],[4,3],[4,4]]
+      }
+    };
+
+    const PATTERN_KEYS = Object.keys(PATTERNS);
+
+    // ===== State =====
+    let called = new Set();
+    let callHistory = [];
+    let currentPattern = 'line';
+    let speechEnabled = true;
+    let selectedVoiceURI = ''; // voice.voiceURI
+    let isAnimating = false;
+    let isPlayerMode = false;
+    let lastKnownTs = 0;
+
+    // ===== DOM =====
+    const boardEl = document.getElementById('bingo-board');
+    const miniCardEl = document.getElementById('mini-card');
+    const patternSelect = document.getElementById('pattern-select');
+    const patternNameEl = document.getElementById('pattern-name');
+    const patternDescEl = document.getElementById('pattern-desc');
+    const lastLetterEl = document.getElementById('last-letter');
+    const lastNumEl = document.getElementById('last-num');
+    const historyList = document.getElementById('history-list');
+    const calledCountEl = document.getElementById('called-count');
+    const overlay = document.getElementById('call-overlay');
+    const overlayLetter = document.getElementById('overlay-letter');
+    const overlayNum = document.getElementById('overlay-num');
+    const speechBtn = document.getElementById('speech-btn');
+    const voiceSelect = document.getElementById('voice-select');
+    const modeBadge = document.getElementById('mode-badge');
+    const syncStatus = document.getElementById('sync-status');
+
+    // ===== Mode =====
+    function detectMode() {
+      const hash = (location.hash || '').toLowerCase();
+      isPlayerMode = hash === '#player' || hash === '#tv';
+      document.body.classList.toggle('player-mode', isPlayerMode);
+      modeBadge.textContent = isPlayerMode ? 'Player / TV' : 'Caller';
+      document.querySelectorAll('.player-only').forEach(el => {
+        el.style.display = isPlayerMode ? 'block' : 'none';
+      });
+    }
+
+    // ===== Sync (improved) =====
+    const channel = ('BroadcastChannel' in window) ? new BroadcastChannel(CHANNEL_NAME) : null;
+
+    function saveState() {
+      const data = {
+        called: Array.from(called),
+        history: callHistory,
+        pattern: currentPattern,
+        speechEnabled,
+        selectedVoiceURI,
+        ts: Date.now()
+      };
+      lastKnownTs = data.ts;
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      } catch (e) {}
+      if (channel) {
+        channel.postMessage({ type: 'state', data });
+      }
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return false;
+        const data = JSON.parse(raw);
+        applyStateData(data, false);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function applyStateData(data, triggerAnimation) {
+      if (!data) return;
+      const prevLen = callHistory.length;
+      called = new Set(data.called || []);
+      callHistory = data.history || [];
+      currentPattern = data.pattern || 'line';
+      patternSelect.value = currentPattern;
+      if (typeof data.speechEnabled === 'boolean') {
+        speechEnabled = data.speechEnabled;
+        speechBtn.textContent = speechEnabled ? '🔊 On' : '🔇 Off';
+      }
+      if (data.selectedVoiceURI !== undefined) {
+        selectedVoiceURI = data.selectedVoiceURI || '';
+        // try to restore the select value once voices are loaded
+        if (voiceSelect.options.length > 1) {
+          voiceSelect.value = selectedVoiceURI;
+        }
+      }
+      lastKnownTs = data.ts || 0;
+
+      buildMiniCard();
+      updateBoardUI();
+
+      // Animate on Player if a new number arrived recently
+      if (triggerAnimation && isPlayerMode && callHistory.length > prevLen && callHistory.length > 0) {
+        const latest = callHistory[0];
+        const age = Date.now() - (data.ts || 0);
+        if (age < 5000 && !isAnimating) {
+          showBigCall(latest.letter, latest.num);
+        }
+      }
+    }
+
+    if (channel) {
+      channel.onmessage = (ev) => {
+        if (ev.data && ev.data.type === 'state') {
+          applyStateData(ev.data.data, true);
+          syncStatus.textContent = 'Live sync · ' + new Date().toLocaleTimeString();
+        }
+      };
+    }
+
+    window.addEventListener('storage', (e) => {
+      if (e.key === STORAGE_KEY && e.newValue) {
+        try {
+          applyStateData(JSON.parse(e.newValue), true);
+          syncStatus.textContent = 'Live sync · ' + new Date().toLocaleTimeString();
+        } catch (err) {}
+      }
+    });
+
+    // Fallback polling for Player view (every 1.2s) so it never needs a manual refresh
+    setInterval(() => {
+      if (!isPlayerMode) return;
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        if (data.ts && data.ts > lastKnownTs) {
+          applyStateData(data, true);
+          syncStatus.textContent = 'Live sync · ' + new Date().toLocaleTimeString();
+        }
+      } catch (e) {}
+    }, 1200);
+
+    // ===== Helpers =====
+    function getLetter(n) {
+      if (n <= 15) return 'B';
+      if (n <= 30) return 'I';
+      if (n <= 45) return 'N';
+      if (n <= 60) return 'G';
+      return 'O';
+    }
+
+    function buildBoard() {
+      boardEl.innerHTML = '';
+      LETTERS.forEach(letter => {
+        const col = document.createElement('div');
+        col.className = 'column';
+        const header = document.createElement('div');
+        header.className = `col-header ${letter}`;
+        header.textContent = letter;
+        col.appendChild(header);
+
+        COLUMNS[letter].forEach(num => {
+          const btn = document.createElement('button');
+          btn.className = 'number-btn';
+          btn.textContent = num;
+          btn.dataset.num = num;
+          if (!isPlayerMode) {
+            btn.addEventListener('click', () => onNumberClick(num));
+          }
+          col.appendChild(btn);
+        });
+        boardEl.appendChild(col);
+      });
+      updateBoardUI();
+    }
+
+    function buildMiniCard() {
+      const pattern = PATTERNS[currentPattern] || PATTERNS.line;
+      const cellsSet = new Set(pattern.cells.map(([r,c]) => `${r},${c}`));
+
+      miniCardEl.innerHTML = '';
+      LETTERS.forEach(l => {
+        const cell = document.createElement('div');
+        cell.className = 'mini-cell header';
+        cell.textContent = l;
+        miniCardEl.appendChild(cell);
+      });
+      for (let r = 0; r < 5; r++) {
+        for (let c = 0; c < 5; c++) {
+          const cell = document.createElement('div');
+          cell.className = 'mini-cell';
+          const val = SAMPLE_CARD[r][c];
+          if (val === 'FREE') {
+            cell.classList.add('free');
+            cell.textContent = 'FREE';
+          } else {
+            cell.textContent = val;
+          }
+          if (cellsSet.has(`${r},${c}`)) cell.classList.add('pattern');
+          miniCardEl.appendChild(cell);
+        }
+      }
+      patternNameEl.textContent = pattern.name;
+      patternDescEl.textContent = pattern.desc;
+    }
+
+    function updateBoardUI() {
+      document.querySelectorAll('.number-btn').forEach(btn => {
+        const n = parseInt(btn.dataset.num, 10);
+        btn.classList.toggle('called', called.has(n));
+      });
+      calledCountEl.textContent = called.size;
+
+      if (callHistory.length === 0) {
+        lastLetterEl.textContent = '—';
+        lastNumEl.textContent = '—';
+        historyList.innerHTML = '<div style="text-align:center;color:#5a6a7a;font-size:0.8rem;padding:18px 0;">No numbers called yet</div>';
+      } else {
+        const latest = callHistory[0];
+        lastLetterEl.textContent = latest.letter;
+        lastNumEl.textContent = latest.num;
+        historyList.innerHTML = callHistory.slice(0, 18).map((item, i) =>
+          `<div class="history-item"><span>${item.letter}-${item.num}</span><span style="opacity:0.55;font-size:0.75em;">#${callHistory.length - i}</span></div>`
+        ).join('');
+      }
+    }
+
+    function onNumberClick(num) {
+      if (isPlayerMode || isAnimating) return;
+      if (called.has(num)) return;
+      callNumber(num);
+    }
+
+    function callNumber(num) {
+      const letter = getLetter(num);
+      called.add(num);
+      callHistory.unshift({ letter, num });
+      updateBoardUI();
+      saveState();
+      showBigCall(letter, num);
+
+      if (speechEnabled && window.speechSynthesis) {
+        speakNumber(letter, num);
+      }
+    }
+
+    function speakNumber(letter, num) {
+      if (!window.speechSynthesis) return;
+      const utter = new SpeechSynthesisUtterance(`${letter} ${num}`);
+      utter.rate = 0.92;
+      utter.pitch = 1.0;
+
+      const voices = speechSynthesis.getVoices();
+      let voice = null;
+
+      if (selectedVoiceURI) {
+        voice = voices.find(v => v.voiceURI === selectedVoiceURI);
+      }
+      // sensible fallbacks if nothing selected or voice disappeared
+      if (!voice) {
+        voice = voices.find(v => v.lang.startsWith('en') && /Google|Microsoft|Samantha|Daniel|Alex|Karen|Moira|Fiona|Rishi|Serena/i.test(v.name))
+             || voices.find(v => v.lang.startsWith('en-US'))
+             || voices.find(v => v.lang.startsWith('en'))
+             || voices[0];
+      }
+      if (voice) utter.voice = voice;
+
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utter);
+    }
+
+    function populateVoices() {
+      if (!window.speechSynthesis) return;
+      const voices = speechSynthesis.getVoices()
+        .filter(v => v.lang.startsWith('en'))
+        .sort((a, b) => a.name.localeCompare(b.name));
+
+      const current = voiceSelect.value || selectedVoiceURI;
+      voiceSelect.innerHTML = '<option value="">Browser default</option>';
+
+      // Group a little for nicer UX
+      const preferredNames = /Google|Microsoft|Samantha|Daniel|Alex|Karen|Moira|Fiona|Serena|Rishi|Zira|David|Mark|Susan/i;
+
+      voices.forEach(v => {
+        const opt = document.createElement('option');
+        opt.value = v.voiceURI;
+        // Show a clean label
+        let label = v.name.replace(/Microsoft |Google |Apple /gi, '');
+        if (v.lang) label += ` (${v.lang})`;
+        opt.textContent = label;
+        if (preferredNames.test(v.name)) {
+          opt.textContent = '★ ' + opt.textContent;
+        }
+        voiceSelect.appendChild(opt);
+      });
+
+      // restore selection
+      if (current && [...voiceSelect.options].some(o => o.value === current)) {
+        voiceSelect.value = current;
+        selectedVoiceURI = current;
+      } else {
+        voiceSelect.value = '';
+      }
+    }
+
+    function showBigCall(letter, num) {
+      isAnimating = true;
+      overlayLetter.textContent = letter;
+      overlayNum.textContent = num;
+      overlay.classList.remove('dissolving');
+      overlay.classList.add('visible');
+
+      setTimeout(() => {
+        overlay.classList.add('dissolving');
+        setTimeout(() => {
+          overlay.classList.remove('visible', 'dissolving');
+          isAnimating = false;
+        }, 750);
+      }, 2400);
+    }
+
+    function undoLast() {
+      if (isPlayerMode || callHistory.length === 0 || isAnimating) return;
+      const last = callHistory.shift();
+      called.delete(last.num);
+      updateBoardUI();
+      saveState();
+    }
+
+    function resetGame() {
+      if (isPlayerMode || isAnimating) return;
+      if (called.size > 0 && !confirm('Start a brand new game? This clears all called numbers on both Caller and Player views.')) return;
+      called.clear();
+      callHistory = [];
+      updateBoardUI();
+      saveState();
+    }
+
+    function pickRandomPattern() {
+      if (isPlayerMode) return;
+      const randomKey = PATTERN_KEYS[Math.floor(Math.random() * PATTERN_KEYS.length)];
+      currentPattern = randomKey;
+      patternSelect.value = randomKey;
+      buildMiniCard();
+      saveState();
+      // brief visual feedback
+      patternNameEl.style.transition = 'none';
+      patternNameEl.style.transform = 'scale(1.08)';
+      patternNameEl.style.color = '#a855f7';
+      setTimeout(() => {
+        patternNameEl.style.transition = 'transform 0.3s, color 0.3s';
+        patternNameEl.style.transform = 'scale(1)';
+        patternNameEl.style.color = '';
+      }, 350);
+    }
+
+    // ===== Events =====
+    patternSelect.addEventListener('change', () => {
+      currentPattern = patternSelect.value;
+      buildMiniCard();
+      saveState();
+    });
+
+    document.getElementById('random-pattern-btn').addEventListener('click', pickRandomPattern);
+    document.getElementById('undo-btn').addEventListener('click', undoLast);
+    document.getElementById('reset-btn').addEventListener('click', resetGame);
+
+    speechBtn.addEventListener('click', () => {
+      speechEnabled = !speechEnabled;
+      speechBtn.textContent = speechEnabled ? '🔊 On' : '🔇 Off';
+      saveState();
+    });
+
+    voiceSelect.addEventListener('change', () => {
+      selectedVoiceURI = voiceSelect.value;
+      saveState();
+      // quick preview so user can hear the voice
+      if (speechEnabled && selectedVoiceURI) {
+        speakNumber('B', 12);
+      }
+    });
+
+    document.getElementById('open-player-btn').addEventListener('click', () => {
+      const url = location.href.split('#')[0] + '#player';
+      window.open(url, '_blank');
+    });
+
+    document.getElementById('fs-btn').addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(()=>{});
+      } else {
+        document.exitFullscreen();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (isPlayerMode) return;
+      if (e.key === 'u' || e.key === 'U') undoLast();
+      if (e.key === 'r' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); resetGame(); }
+      if (e.key === 'f' || e.key === 'F') document.getElementById('fs-btn').click();
+      if (e.key === 'g' || e.key === 'G') pickRandomPattern();
+    });
+
+    window.addEventListener('hashchange', () => {
+      detectMode();
+      buildBoard();
+    });
+
+    // ===== Init =====
+    detectMode();
+    loadState();
+    buildBoard();
+    buildMiniCard();
+
+    if (window.speechSynthesis) {
+      // Voices often load asynchronously
+      populateVoices();
+      speechSynthesis.onvoiceschanged = () => {
+        populateVoices();
+      };
+      // Extra safety for Chrome
+      setTimeout(populateVoices, 300);
+      setTimeout(populateVoices, 1000);
+    }
+
+    if (!isPlayerMode) {
+      syncStatus.textContent = 'Caller ready · Open Player View for the TV (auto-syncs)';
+    } else {
+      syncStatus.textContent = 'Player view · Live updates from Caller (no refresh needed)';
+    }
+  </script>
+</body>
+</html>
