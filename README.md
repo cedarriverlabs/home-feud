@@ -19,3 +19,8 @@ To activate them, open `Home-Feud.html` on GitHub, click the pencil, and add the
 ```
 
 Then commit. After that the side scores, tile flip, and "reveal next remaining" will be live. No full file download needed.
+
+## Also hosted here
+
+Ready Suit Go sample (separate product, published here because this repo already has Pages): https://cedarriverlabs.github.io/home-feud/ready-suit-go/
+Source repo: https://github.com/cedarriverlabs/ready-suit-go
